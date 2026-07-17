@@ -1,0 +1,6 @@
+{
+  "name": "Little Stars Academy",
+  "description": "A storybook-style marketing website for Little Stars Academy kindergarten and playgroup, serving ages 2-6 with interactive programs, horizontal day timeline, and a cozy twilight-to-dawn design concept.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
