@@ -1,104 +1,163 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { TEACHERS_DATA } from '../data';
 import { HandDrawnStar } from './SVGIcons';
+import { supabase } from '../lib/supabaseClient';
+import { Teacher } from '../types';
 
 export const Teachers: React.FC = () => {
-  // Cycle monogram colors
-  const getAvatarBgColor = (idx: number) => {
-    const colors = [
-      'bg-marigold/15 text-marigold-deep border-marigold/30',
-      'bg-coral/15 text-coral border-coral/30',
-      'bg-meadow/15 text-meadow border-meadow/30',
-      'bg-twilight/15 text-twilight border-twilight/30',
+  const [teachers, setTeachers] = useState<Teacher[]>(TEACHERS_DATA);
+
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('teachers')
+          .select('*');
+
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const mapped: Teacher[] = data.map(item => ({
+            id: item.id,
+            initials: item.initials,
+            name: item.name,
+            role: item.role,
+            quote: item.quote,
+            experienceYears: item.experience_years
+          }));
+          setTeachers(mapped);
+        }
+      } catch (err) {
+        console.error('Failed to fetch teachers from Supabase, using local fallback:', err);
+      }
+    };
+
+    fetchTeachers();
+  }, []);
+
+  const getCardStyle = (idx: number) => {
+    // Deterministic random-like values for a "scattered" pile look
+    const styles = [
+      { rotate: -4, x: -10, y: 10, bg: 'bg-[#FDF9F1] border-marigold/10' },
+      { rotate: 6, x: 10, y: -20, bg: 'bg-[#FFF5F3] border-coral/10' },
+      { rotate: -8, x: -5, y: -5, bg: 'bg-[#F2FAF6] border-meadow/10' },
+      { rotate: 3, x: 20, y: 15, bg: 'bg-[#F4F6FB] border-twilight/10' },
+      { rotate: -2, x: 0, y: -10, bg: 'bg-white border-black/5' },
     ];
-    return colors[idx % colors.length];
+    return styles[idx % styles.length];
   };
 
   return (
-    <section id="teachers" className="py-20 md:py-28 bg-cream scroll-mt-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="teachers" className="py-24 md:py-48 bg-white scroll-mt-12 overflow-hidden relative">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-          <motion.span
-            initial={{ opacity: 0, y: 15 }}
+        {/* Editorial Section Header */}
+        <div className="text-center max-w-3xl mx-auto mb-20 md:mb-32 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5 }}
-            className="text-meadow font-display font-semibold uppercase tracking-wider text-xs sm:text-sm bg-meadow/10 px-3 py-1 rounded-full"
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="flex items-center justify-center space-x-4"
           >
-            Nurturing Hearts
-          </motion.span>
+            <div className="h-[1px] w-8 bg-coral/40"></div>
+            <span className="text-coral font-mono text-[10px] uppercase tracking-[0.2em] font-bold">
+              Our Educators
+            </span>
+            <div className="h-[1px] w-8 bg-coral/40"></div>
+          </motion.div>
+          
           <motion.h2
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-ink font-display font-bold tracking-tight"
-            style={{ fontSize: 'clamp(26px, 3.6vw, 38px)' }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="text-ink text-editorial-hero font-bold tracking-tight leading-[1.05]"
           >
-            Meet the hearts behind our stars
+            Meet the hearts <br/>
+            <span className="text-ink/30 italic font-serif font-normal block mt-2">behind our stars.</span>
           </motion.h2>
+          
           <motion.p
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-ink-soft font-sans text-sm sm:text-base leading-relaxed"
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="text-ink/60 text-editorial-body max-w-xl mx-auto pt-4"
           >
-            Our educators aren’t instructors; they are gentle facilitators of discovery. Grounded in child development psychology and active play methodology.
+            Not just instructors, but gentle facilitators of discovery. Grounded in child development psychology and active play methodology.
           </motion.p>
         </div>
 
-        {/* 4-Card Teachers Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {TEACHERS_DATA.map((teacher, index) => (
-            <motion.div
-              key={teacher.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="bg-white rounded-3xl p-6 border border-cream-soft shadow-[0_4px_20px_-4px_rgba(45,42,61,0.04)] hover:shadow-[0_12px_24px_-4px_rgba(45,42,61,0.08)] hover:scale-[1.02] transition-all duration-300 flex flex-col justify-between text-center relative group"
-            >
-              {/* Outer floating star decoration on card hover */}
-              <div className="absolute top-4 right-4 text-marigold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <HandDrawnStar size={14} />
-              </div>
+        {/* Scattered Polaroid Pile */}
+        <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8 lg:gap-12 pb-24">
+          {teachers.map((teacher, index) => {
+            const styleInfo = getCardStyle(index);
+            
+            return (
+              <motion.div
+                key={teacher.id}
+                initial={{ opacity: 0, y: 60, rotate: 0 }}
+                whileInView={{ 
+                  opacity: 1, 
+                  y: styleInfo.y, 
+                  x: styleInfo.x,
+                  rotate: styleInfo.rotate 
+                }}
+                whileHover={{ 
+                  scale: 1.05, 
+                  rotate: 0,
+                  y: -10, // slightly lift up
+                  zIndex: 50,
+                  boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.15)"
+                }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ 
+                  type: "spring", 
+                  stiffness: 300, 
+                  damping: 20,
+                  mass: 0.8
+                }}
+                className={`group relative flex flex-col w-[300px] md:w-[340px] bg-white p-6 md:p-8 rounded-2xl border-[3px] shadow-paper z-10 cursor-pointer ${styleInfo.bg}`}
+              >
+                {/* Pin tape / clip illusion */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-12 h-4 bg-white/80 backdrop-blur-sm border border-black/5 rotate-2 shadow-sm z-20"></div>
 
-              {/* Avatar Column */}
-              <div className="flex flex-col items-center">
-                <div className={`w-20 h-20 rounded-full border-2 flex items-center justify-center font-display font-bold text-xl select-none mb-4 shadow-sm ${getAvatarBgColor(index)}`}>
-                  {teacher.initials}
+                {/* Top Section: Avatar & Name */}
+                <div className="flex items-center space-x-4 relative z-10 mb-8 border-b border-black/[0.04] pb-6">
+                  <div className={`w-16 h-16 rounded-full border border-black/5 flex items-center justify-center font-display font-bold text-xl select-none bg-white shadow-sm text-ink group-hover:scale-110 transition-transform duration-500`}>
+                    {teacher.initials}
+                  </div>
+
+                  <div className="space-y-1">
+                    <h3 className="text-ink font-display font-bold text-xl tracking-tight leading-none group-hover:text-coral transition-colors duration-300">
+                      {teacher.name}
+                    </h3>
+                    <p className="text-ink/40 font-mono text-[9px] uppercase tracking-widest font-bold">
+                      {teacher.role}
+                    </p>
+                  </div>
                 </div>
 
-                <div className="space-y-1">
-                  <h3 className="text-ink font-display font-bold text-lg tracking-tight">
-                    {teacher.name}
-                  </h3>
-                  <p className="text-coral font-sans text-xs font-semibold uppercase tracking-wider">
-                    {teacher.role}
+                {/* Middle Section: Quote */}
+                <div className="relative z-10 flex-grow mb-8">
+                  <span className="absolute -top-6 -left-2 text-ink/10 text-6xl font-serif leading-none select-none">"</span>
+                  <p className="font-serif italic text-ink/70 text-lg leading-relaxed relative z-10 pl-2">
+                    {teacher.quote}
                   </p>
                 </div>
-              </div>
 
-              {/* First-person Handwritten Quote */}
-              <div className="my-6 relative py-3 bg-cream-soft/40 rounded-2xl px-4 border border-marigold/5">
-                <span className="absolute top-1 left-2 text-marigold text-2xl select-none font-serif">“</span>
-                <p className="font-handwritten text-ink text-lg leading-snug">
-                  {teacher.quote}
-                </p>
-                <span className="absolute bottom-1 right-2 text-marigold text-2xl select-none font-serif">”</span>
-              </div>
-
-              {/* Experience badge */}
-              <div className="pt-4 border-t border-cream-soft flex items-center justify-between text-[11px] font-mono font-semibold tracking-wider text-ink-soft/50 uppercase">
-                <span>DEDICATED VISITS</span>
-                <span className="text-twilight font-bold">{teacher.experienceYears}+ Years Exp</span>
-              </div>
-            </motion.div>
-          ))}
+                {/* Bottom Section: Details */}
+                <div className="mt-auto flex items-center justify-between relative z-10">
+                  <span className="text-ink/30 font-mono text-[9px] uppercase tracking-widest font-bold">Experience</span>
+                  <span className="text-ink font-sans text-sm font-medium bg-black/5 px-3 py-1 rounded-full">
+                    {teacher.experienceYears}+ Yrs
+                  </span>
+                </div>
+                
+              </motion.div>
+            );
+          })}
         </div>
 
       </div>

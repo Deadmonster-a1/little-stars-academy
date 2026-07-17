@@ -3,7 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import Lenis from 'lenis';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { StickyNav } from './components/StickyNav';
 import { Hero } from './components/Hero';
 import { WhyUs } from './components/WhyUs';
@@ -16,19 +19,43 @@ import { FeesAdmissions } from './components/FeesAdmissions';
 import { BookVisit } from './components/BookVisit';
 import { Footer } from './components/Footer';
 import { FloatingElements } from './components/FloatingElements';
-import { CustomCursor } from './components/CustomCursor';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), 
+      smoothWheel: true,
+    });
+
+    lenis.on('scroll', ScrollTrigger.update);
+
+    const tick = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+
+    gsap.ticker.add(tick);
+    gsap.ticker.lagSmoothing(0);
+
+    return () => {
+      lenis.destroy();
+      gsap.ticker.remove(tick);
+    };
+  }, []);
+
   const scrollToInquiryForm = () => {
     const section = document.getElementById('book-visit');
     if (section) {
+      // For Lenis, it's better to just use window.scrollTo with native behavior and Lenis handles it, 
+      // but native scrollIntoView works fine too.
       section.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-cream text-ink select-none selection:bg-marigold/30">
-      <CustomCursor />
+    <div className="min-h-screen flex flex-col font-sans bg-cream text-ink selection:bg-marigold/30">
       {/* Sticky Navigation */}
       <StickyNav onBookVisitClick={scrollToInquiryForm} />
 
@@ -65,4 +92,7 @@ export default function App() {
       <Footer />
 
       {/* Floating Call CTA Widgets */}
-   
+      <FloatingElements onBookVisitClick={scrollToInquiryForm} />
+    </div>
+  );
+}

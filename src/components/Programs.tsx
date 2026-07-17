@@ -1,12 +1,44 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { PROGRAMS_DATA } from '../data';
 import { HandDrawnStar } from './SVGIcons';
+import { supabase } from '../lib/supabaseClient';
+import { Program } from '../types';
 
 type AgeFilter = 'all' | '2-3' | '3-4' | '4-5' | '5-6';
 
 export const Programs: React.FC = () => {
+  const [programs, setPrograms] = useState<Program[]>(PROGRAMS_DATA);
   const [activeFilter, setActiveFilter] = useState<AgeFilter>('all');
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchPrograms = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('programs')
+          .select('*');
+        
+        if (error) throw error;
+        if (data && data.length > 0) {
+          const mapped: Program[] = data.map(item => ({
+            id: item.id,
+            name: item.name,
+            stars: item.stars,
+            ageRange: item.age_range,
+            highlights: item.highlights,
+            timing: item.timing,
+            annualFee: item.annual_fee
+          }));
+          setPrograms(mapped);
+        }
+      } catch (err) {
+        console.error('Failed to fetch programs from Supabase, using local fallback:', err);
+      }
+    };
+
+    fetchPrograms();
+  }, []);
 
   const filters: { label: string; value: AgeFilter }[] = [
     { label: 'All Programs', value: 'all' },
@@ -16,8 +48,7 @@ export const Programs: React.FC = () => {
     { label: 'Ages 5 – 6', value: '5-6' },
   ];
 
-  // Helper to determine if program matches filter
-  const filteredPrograms = PROGRAMS_DATA.filter((prog) => {
+  const filteredPrograms = programs.filter((prog) => {
     if (activeFilter === 'all') return true;
     if (activeFilter === '2-3') return prog.id === 'playgroup';
     if (activeFilter === '3-4') return prog.id === 'nursery';
@@ -26,52 +57,62 @@ export const Programs: React.FC = () => {
     return true;
   });
 
+  const getBgClass = (index: number) => {
+    const colors = [
+      'bg-[#FDF9F1] border-marigold/10',
+      'bg-[#FFF5F3] border-coral/10',
+      'bg-[#F2FAF6] border-meadow/10',
+      'bg-[#F4F6FB] border-twilight/10'
+    ];
+    return colors[index % colors.length];
+  };
+
+  const getTextColor = (index: number) => {
+    const colors = ['text-marigold', 'text-coral', 'text-meadow', 'text-twilight'];
+    return colors[index % colors.length];
+  };
+
   return (
-    <section id="programs" className="py-20 md:py-28 bg-cream-soft scroll-mt-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="programs" className="py-24 md:py-32 bg-white scroll-mt-12 relative z-10 overflow-hidden">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
-          <motion.span
-            initial={{ opacity: 0, y: 15 }}
+        {/* Editorial Section Header */}
+        <div className="max-w-3xl mb-24 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5 }}
-            className="text-meadow font-display font-semibold uppercase tracking-wider text-xs sm:text-sm bg-meadow/10 px-3 py-1 rounded-full"
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="flex items-center space-x-4"
           >
-            Guided Growth Path
-          </motion.span>
+            <div className="h-[1px] w-12 bg-coral/40"></div>
+            <span className="text-coral font-mono text-[10px] uppercase tracking-[0.2em] font-bold">
+              Curriculum Architecture
+            </span>
+          </motion.div>
+          
           <motion.h2
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-ink font-display font-bold tracking-tight"
-            style={{ fontSize: 'clamp(26px, 3.6vw, 38px)' }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="text-ink text-editorial-hero font-bold tracking-tight leading-[1.05]"
           >
-            Four milestones, one continuous light
+            Four milestones. <br/>
+            <span className="text-ink/30 italic font-serif font-normal block mt-2">One continuous light.</span>
           </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-ink-soft font-sans text-sm sm:text-base leading-relaxed"
-          >
-            We guide children from safe, exploratory playgroup steps to robust, phonics-fluent kindergarten preparation. Choose an age group to see their custom path.
-          </motion.p>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex flex-wrap items-center justify-center gap-2 mb-12">
+        {/* Minimalist Filter Tabs */}
+        <div className="flex flex-wrap items-center gap-2 mb-16">
           {filters.map((filter) => (
             <button
               key={filter.value}
               onClick={() => setActiveFilter(filter.value)}
-              className={`px-5 py-2.5 rounded-full font-display font-medium text-xs sm:text-sm tracking-wide transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-twilight border-2 ${
+              className={`px-5 py-2.5 rounded-full font-sans text-xs tracking-wide transition-colors duration-300 border ${
                 activeFilter === filter.value
-                  ? 'bg-twilight border-twilight text-cream-soft shadow-md hover:bg-twilight-deep'
-                  : 'bg-white/40 border-twilight/10 hover:border-twilight/20 text-ink-soft hover:text-ink'
+                  ? 'bg-ink border-ink text-cream'
+                  : 'bg-transparent border-black/10 text-ink/60 hover:border-black/30 hover:text-ink'
               }`}
             >
               {filter.label}
@@ -79,79 +120,104 @@ export const Programs: React.FC = () => {
           ))}
         </div>
 
-        {/* Programs Grid */}
-        <div className="relative min-h-[400px]">
-          <motion.div
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8"
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredPrograms.map((prog) => (
+        {/* Ultra-Wide Interactive Accordion Grid */}
+        <div 
+          className="flex flex-col lg:flex-row w-full h-[800px] lg:h-[650px] gap-4"
+          onMouseLeave={() => setHoveredIndex(null)}
+        >
+          <AnimatePresence mode="popLayout">
+            {filteredPrograms.map((prog, index) => {
+              const isHovered = hoveredIndex === index;
+              const isAnyHovered = hoveredIndex !== null;
+              // If none hovered, they are equal. If one is hovered, it gets flex 3 or 4, rest get 1.
+              const flexValue = isHovered ? 5 : (isAnyHovered ? 1 : 2);
+              
+              return (
                 <motion.div
-                  key={prog.id}
                   layout
-                  initial={{ opacity: 0, scale: 0.95, y: 15 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: 15 }}
-                  transition={{ duration: 0.4 }}
-                  className="bg-white rounded-2xl p-6 lg:p-8 border border-cream-soft shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-full relative group hover:scale-[1.01]"
-                  data-age={prog.ageRange}
+                  key={prog.id}
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  style={{ flex: flexValue }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+                  className={`relative overflow-hidden rounded-[2.5rem] border-[3px] shadow-sm transition-shadow hover:shadow-paper ${getBgClass(index)} group`}
                 >
-                  {/* Decorative Background Glow on Hover */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-marigold/0 to-marigold/[0.03] opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity duration-300 pointer-events-none" />
-
-                  <div>
-                    {/* Star Level Progression device instead of numbers */}
-                    <div className="flex items-center space-x-1 text-marigold mb-5 select-none" aria-label={`Star level ${prog.stars}`}>
-                      {Array.from({ length: 4 }).map((_, i) => (
-                        <HandDrawnStar
-                          key={i}
-                          size={16}
-                          filled={i < prog.stars}
-                          className={i < prog.stars ? 'text-marigold' : 'text-cream-soft'}
-                        />
-                      ))}
-                    </div>
-
-                    {/* Program Header */}
-                    <div className="space-y-1.5 mb-6">
-                      <h3 className="text-ink font-display font-bold text-xl lg:text-2xl tracking-tight">
-                        {prog.name}
-                      </h3>
-                      <div className="inline-block bg-coral/10 text-coral font-sans text-xs font-bold tracking-wide px-2.5 py-0.5 rounded-md">
-                        {prog.ageRange}
+                  <div className="absolute inset-0 w-full h-full flex flex-col p-8 lg:p-12">
+                    
+                    {/* Top Identity Block - Always visible but reorients */}
+                    <div className="flex justify-between items-start z-10 relative">
+                      <div className="inline-block bg-white text-ink font-mono text-[10px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-full border border-black/5 shadow-sm">
+                        Ages {prog.ageRange}
+                      </div>
+                      <div className="flex items-center space-x-0.5">
+                        {Array.from({ length: 4 }).map((_, i) => (
+                          <HandDrawnStar
+                            key={i}
+                            size={14}
+                            filled={i < prog.stars}
+                            className={i < prog.stars ? getTextColor(index) : 'text-black/10'}
+                          />
+                        ))}
                       </div>
                     </div>
 
-                    {/* Bullet Highlights using stars */}
-                    <ul className="space-y-3 mb-8">
-                      {prog.highlights.map((highlight, idx) => (
-                        <li key={idx} className="flex items-start space-x-2.5 text-xs sm:text-sm text-ink-soft leading-relaxed">
-                          <span className="text-marigold mt-1 shrink-0 select-none">
-                            <HandDrawnStar size={12} />
-                          </span>
-                          <span>{highlight}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Footnote details */}
-                  <div className="pt-6 border-t border-cream-soft space-y-2 mt-auto">
-                    <div className="flex justify-between items-center text-[11px] font-mono tracking-wide">
-                      <span className="text-ink-soft/60 uppercase">DAILY TIMING:</span>
-                      <span className="text-twilight font-bold">{prog.timing}</span>
+                    {/* Collapsed Title (Rotated on Desktop, Normal on Mobile) */}
+                    <div className={`absolute left-0 bottom-8 lg:bottom-12 w-full px-8 lg:px-0 transition-opacity duration-500 z-10 ${isHovered ? 'opacity-0 pointer-events-none' : 'opacity-100'} ${!isAnyHovered ? 'lg:opacity-100' : 'lg:opacity-0'}`}>
+                      {/* Desktop Rotated Text */}
+                      <h3 className="hidden lg:block text-ink font-display font-bold text-3xl whitespace-nowrap origin-bottom-left -rotate-90 absolute left-12 bottom-0 pb-12 translate-y-full tracking-tight">
+                        {prog.name}
+                      </h3>
+                      {/* Mobile Normal Text */}
+                      <h3 className="lg:hidden text-ink font-display font-bold text-3xl tracking-tight">
+                        {prog.name}
+                      </h3>
                     </div>
-                    <div className="flex justify-between items-center text-[11px] font-mono tracking-wide">
-                      <span className="text-ink-soft/60 uppercase">EST. VALUE:</span>
-                      <span className="text-ink font-bold font-sans">₹{prog.annualFee.toLocaleString()}/yr</span>
-                    </div>
-                  </div>
 
+                    {/* Expanded Content Details */}
+                    <div className={`mt-auto transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] z-20 ${isHovered || (!isAnyHovered && window.innerWidth < 1024) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8 pointer-events-none lg:opacity-0'}`}>
+                      <h3 className="text-ink font-display font-bold text-4xl lg:text-5xl tracking-tight mb-8">
+                        {prog.name}
+                      </h3>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-12">
+                        {/* Highlights */}
+                        <div>
+                          <p className="text-ink/40 font-mono text-[10px] uppercase tracking-widest mb-4 font-bold">Key Developmental Focus</p>
+                          <ul className="space-y-3">
+                            {prog.highlights.slice(0, 3).map((highlight, idx) => (
+                              <li key={idx} className="flex items-start">
+                                <span className={`mt-1 mr-3 shrink-0 ${getTextColor(index)}`}>
+                                  <HandDrawnStar size={12} />
+                                </span>
+                                <span className="text-ink/80 font-sans text-sm md:text-base">
+                                  {highlight}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        
+                        {/* Meta Info */}
+                        <div className="space-y-4 md:border-l border-black/5 md:pl-8">
+                          <div>
+                            <span className="text-ink/40 font-mono text-[10px] uppercase tracking-widest block mb-1 font-bold">Timing</span>
+                            <span className="text-ink font-medium font-sans text-sm">{prog.timing}</span>
+                          </div>
+                          <div>
+                            <span className="text-ink/40 font-mono text-[10px] uppercase tracking-widest block mb-1 font-bold">Est. Value</span>
+                            <span className="text-ink font-medium font-sans text-sm">₹{prog.annualFee.toLocaleString()}/yr</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Giant background abstract shape based on name length to give character */}
+                    <div className={`absolute -right-20 -bottom-20 w-96 h-96 rounded-full blur-3xl opacity-20 pointer-events-none z-0 ${getBgClass(index).replace('bg-', 'bg-gradient-to-tr from-transparent to-')}`} />
+
+                  </div>
                 </motion.div>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+              );
+            })}
+          </AnimatePresence>
         </div>
 
       </div>

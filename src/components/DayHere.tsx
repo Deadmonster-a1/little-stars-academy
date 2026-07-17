@@ -1,191 +1,136 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useRef } from 'react';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { DAY_STOPS_DATA } from '../data';
 import { HandDrawnStar } from './SVGIcons';
-import { Sun, Sparkles, Clock, Compass, Coffee, Smile, BookOpen, LogOut } from 'lucide-react';
+import { Sun, Sparkles, Compass, Coffee, Smile, BookOpen, LogOut, Clock } from 'lucide-react';
+
+const getStopIcon = (id: string, size = 32) => {
+  switch (id) {
+    case 'welcome': return <Sun size={size} className="text-marigold" />;
+    case 'circle': return <Sparkles size={size} className="text-coral" />;
+    case 'sensory': return <Compass size={size} className="text-meadow" />;
+    case 'snack': return <Coffee size={size} className="text-marigold" />;
+    case 'outdoor': return <Smile size={size} className="text-meadow" />;
+    case 'creative': return <Sparkles size={size} className="text-coral" />;
+    case 'story': return <BookOpen size={size} className="text-twilight" />;
+    case 'dismissal': return <LogOut size={size} className="text-marigold" />;
+    default: return <Clock size={size} className="text-marigold" />;
+  }
+};
+
+const TimelineItem = ({ stop, index, total }: { stop: typeof DAY_STOPS_DATA[0], index: number, total: number }) => {
+  return (
+    <motion.div 
+      initial={{ opacity: 0.2, filter: 'blur(4px)' }}
+      whileInView={{ opacity: 1, filter: 'blur(0px)' }}
+      viewport={{ margin: '-40% 0px -40% 0px' }} // Only fully visible when centered vertically
+      transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+      className="min-h-[70vh] flex flex-col justify-center relative py-12"
+    >
+      {/* Visual connecting line */}
+      {index !== total - 1 && (
+        <div className="absolute top-[50%] bottom-[-50%] left-6 w-[2px] bg-gradient-to-b from-black/10 to-transparent -z-10" />
+      )}
+
+      <div className="flex items-start space-x-8">
+        <div className="w-12 h-12 shrink-0 rounded-full bg-white border-2 border-cream shadow-sm flex items-center justify-center relative z-10 mt-2">
+          {getStopIcon(stop.id, 20)}
+        </div>
+        
+        <div className="space-y-4">
+          <div className="flex items-center space-x-4">
+            <span className="text-ink/40 font-mono text-sm tracking-widest">{stop.time}</span>
+            <span className="text-coral font-mono text-[10px] uppercase tracking-[0.2em] font-bold px-3 py-1 bg-coral/5 rounded-full">
+              {stop.category}
+            </span>
+          </div>
+          
+          <h3 className="text-ink font-display font-bold text-4xl lg:text-5xl tracking-tight leading-[1.1]">
+            {stop.title}
+          </h3>
+          
+          <p className="text-ink/60 font-sans text-xl lg:text-2xl leading-relaxed max-w-xl">
+            {stop.description}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 export const DayHere: React.FC = () => {
-  const [activeStopId, setActiveStopId] = useState(DAY_STOPS_DATA[0].id);
-
-  const activeStop = DAY_STOPS_DATA.find((stop) => stop.id === activeStopId) || DAY_STOPS_DATA[0];
-
-  // Helper to map icons based on stop id
-  const getStopIcon = (id: string, size = 32) => {
-    switch (id) {
-      case 'welcome':
-        return <Sun size={size} className="text-marigold" />;
-      case 'circle':
-        return <Sparkles size={size} className="text-coral" />;
-      case 'sensory':
-        return <Compass size={size} className="text-meadow" />;
-      case 'snack':
-        return <Coffee size={size} className="text-marigold" />;
-      case 'outdoor':
-        return <Smile size={size} className="text-meadow" />;
-      case 'creative':
-        return <Sparkles size={size} className="text-coral" />;
-      case 'story':
-        return <BookOpen size={size} className="text-twilight" />;
-      case 'dismissal':
-        return <LogOut size={size} className="text-marigold" />;
-      default:
-        return <Clock size={size} className="text-marigold" />;
-    }
-  };
-
+  const containerRef = useRef(null);
+  
   return (
-    <section id="day-here" className="py-20 md:py-28 bg-cream scroll-mt-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-          <motion.span
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5 }}
-            className="text-coral font-display font-semibold uppercase tracking-wider text-xs sm:text-sm bg-coral/10 px-3 py-1 rounded-full"
-          >
-            The Cosmic Rhythm
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-ink font-display font-bold tracking-tight"
-            style={{ fontSize: 'clamp(26px, 3.6vw, 38px)' }}
-          >
-            A day in our starry cosmos
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-ink-soft font-sans text-sm sm:text-base leading-relaxed"
-          >
-            From the soft morning drop-off under the starry arch to the high-five dismissals, we track a beautiful daily balance of sensory focus, creative expression, and outdoor exploration.
-          </motion.p>
+    <section id="day-here" ref={containerRef} className="py-24 bg-[#FAFAFA] relative overflow-hidden">
+      
+      {/* Background Star watermarks */}
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden z-0">
+        <div className="absolute top-40 -left-20 text-ink/[0.02] rotate-12">
+          <HandDrawnStar size={400} />
         </div>
+        <div className="absolute bottom-40 -right-20 text-ink/[0.02] -rotate-12">
+          <HandDrawnStar size={600} />
+        </div>
+      </div>
 
-        {/* Timeline Row Wrapper */}
-        <div className="relative mb-14 bg-cream-soft rounded-3xl p-6 border border-marigold/10 shadow-sm">
-          {/* Connecting dashed line - desktop only */}
-          <div className="absolute top-[52px] left-[8%] right-[8%] h-0.5 border-t-2 border-dashed border-marigold/30 hidden md:block z-0" />
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="flex flex-col lg:flex-row gap-16 lg:gap-32">
+          
+          {/* Left: Sticky Cinematic Header */}
+          <div className="lg:w-1/3 lg:relative">
+            <div className="lg:sticky lg:top-32 space-y-6 pt-12">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                className="flex items-center space-x-4"
+              >
+                <div className="h-[1px] w-12 bg-coral/40"></div>
+                <span className="text-coral font-mono text-[10px] uppercase tracking-[0.2em] font-bold">
+                  The Cosmic Rhythm
+                </span>
+              </motion.div>
+              
+              <motion.h2
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                className="text-ink text-editorial-hero font-bold tracking-tight leading-[1.05]"
+              >
+                A day in our <br/>
+                <span className="text-ink/40 italic font-serif font-normal block mt-2">starry cosmos</span>
+              </motion.h2>
 
-          {/* Swipe indicator for mobile */}
-          <div className="block md:hidden text-center text-[10px] font-mono tracking-widest text-ink-soft/50 uppercase mb-4 animate-pulse select-none">
-            ← Swipe to view complete timeline →
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                className="text-ink/60 text-editorial-body pt-6"
+              >
+                Scroll to explore the gentle, balanced flow of discovery, connection, and joy.
+              </motion.p>
+            </div>
           </div>
 
-          {/* Horizontal scroll container */}
-          <div className="flex overflow-x-auto no-scrollbar pb-2 pt-4 px-2 md:px-6 flex-nowrap justify-between gap-6 md:gap-0 z-10 relative">
-            {DAY_STOPS_DATA.map((stop, idx) => {
-              const isActive = stop.id === activeStopId;
-              return (
-                <div
-                  key={stop.id}
-                  onClick={() => setActiveStopId(stop.id)}
-                  className="flex flex-col items-center cursor-pointer min-w-[100px] shrink-0 text-center select-none group"
-                >
-                  {/* Time label */}
-                  <span className={`text-[11px] font-mono font-bold tracking-wide transition-all duration-300 ${
-                    isActive ? 'text-twilight text-xs' : 'text-ink-soft/60 group-hover:text-ink'
-                  }`}>
-                    {stop.time}
-                  </span>
-
-                  {/* Connecting Timeline Node */}
-                  <div className="my-3 relative flex items-center justify-center">
-                    {/* Pulsing ring behind active dot */}
-                    <AnimatePresence>
-                      {isActive && (
-                        <motion.span
-                          layoutId="active-timeline-ring"
-                          className="absolute w-12 h-12 rounded-full bg-marigold/20"
-                          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-                        />
-                      )}
-                    </AnimatePresence>
-
-                    {/* Timeline dot */}
-                    <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-300 z-10 ${
-                      isActive
-                        ? 'bg-marigold border-marigold text-twilight scale-110 shadow-md'
-                        : 'bg-white border-marigold/30 text-ink-soft group-hover:border-marigold/60 group-hover:text-ink'
-                    }`}>
-                      {isActive ? (
-                        <HandDrawnStar size={14} />
-                      ) : (
-                        <span className="text-xs font-bold">{idx + 1}</span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Short description label */}
-                  <span className={`text-[12px] font-display font-medium max-w-[110px] line-clamp-1 transition-all duration-300 ${
-                    isActive ? 'text-twilight font-bold' : 'text-ink-soft/75 group-hover:text-ink'
-                  }`}>
-                    {stop.category}
-                  </span>
-                </div>
-              );
-            })}
+          {/* Right: Scrolling Timeline */}
+          <div className="lg:w-2/3">
+            <div className="flex flex-col">
+              {DAY_STOPS_DATA.map((stop, idx) => (
+                <TimelineItem 
+                  key={stop.id} 
+                  stop={stop} 
+                  index={idx} 
+                  total={DAY_STOPS_DATA.length} 
+                />
+              ))}
+            </div>
           </div>
+
         </div>
-
-        {/* Detailed Panel Card */}
-        <div className="max-w-4xl mx-auto">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeStop.id}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="bg-white border border-cream-soft rounded-3xl p-6 md:p-10 shadow-[0_10px_30px_-5px_rgba(45,42,61,0.06)] flex flex-col md:flex-row gap-8 items-center"
-            >
-              {/* Left Column: Visual Icon Bubble */}
-              <div className="shrink-0">
-                <div className="w-24 h-24 rounded-2xl bg-cream-soft border border-marigold/20 flex items-center justify-center shadow-inner relative select-none">
-                  {getStopIcon(activeStop.id, 42)}
-                  <div className="absolute -top-2 -right-2 text-marigold animate-pulse-glow">
-                    <HandDrawnStar size={14} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Right Column: Descriptions */}
-              <div className="space-y-4 flex-grow text-center md:text-left">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-cream-soft pb-4">
-                  <div className="space-y-1">
-                    <span className="text-xs uppercase tracking-widest font-mono font-bold text-coral">
-                      {activeStop.category}
-                    </span>
-                    <h3 className="text-ink font-display font-bold text-2xl tracking-tight">
-                      {activeStop.title}
-                    </h3>
-                  </div>
-                  <div className="inline-flex items-center space-x-1.5 self-center md:self-start bg-twilight text-cream-soft px-4 py-1.5 rounded-full font-mono text-sm font-bold shadow-sm select-none">
-                    <Clock size={14} className="text-marigold" />
-                    <span>{activeStop.time}</span>
-                  </div>
-                </div>
-
-                <p className="text-ink-soft font-sans text-sm sm:text-base leading-relaxed">
-                  {activeStop.description}
-                </p>
-
-                {/* Caveat visual handwritten style touch note */}
-                <p className="font-handwritten text-coral font-semibold text-lg md:text-xl pt-2">
-                  ✦ A beautiful drop of child-led wonder in their daily routine.
-                </p>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
       </div>
     </section>
   );

@@ -6,6 +6,35 @@ interface StickyNavProps {
   onBookVisitClick: () => void;
 }
 
+const MagneticButton = ({ children, className, onClick }: { children: React.ReactNode, className: string, onClick: () => void }) => {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouse = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const { clientX, clientY } = e;
+    const { height, width, left, top } = e.currentTarget.getBoundingClientRect();
+    const middleX = clientX - (left + width / 2);
+    const middleY = clientY - (top + height / 2);
+    setPosition({ x: middleX * 0.2, y: middleY * 0.2 });
+  };
+
+  const reset = () => {
+    setPosition({ x: 0, y: 0 });
+  };
+
+  return (
+    <motion.button
+      onClick={onClick}
+      onMouseMove={handleMouse}
+      onMouseLeave={reset}
+      animate={{ x: position.x, y: position.y }}
+      transition={{ type: 'spring', stiffness: 150, damping: 15, mass: 0.1 }}
+      className={className}
+    >
+      {children}
+    </motion.button>
+  );
+};
+
 export const StickyNav: React.FC<StickyNavProps> = ({ onBookVisitClick }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -44,17 +73,20 @@ export const StickyNav: React.FC<StickyNavProps> = ({ onBookVisitClick }) => {
     <>
       <nav
         id="main-nav"
-        className={`fixed top-0 left-0 right-0 z-50 transition-fluid flex justify-center px-4 ${
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 flex justify-center px-4 ${
           isScrolled
             ? 'mt-4'
             : 'mt-6'
         }`}
       >
+        <div className={`w-full max-w-5xl transition-all duration-500 rounded-full ${
+          isScrolled ? 'shadow-paper border border-white/60 bg-cream/95 backdrop-blur-2xl' : ''
+        }`}>
         <div 
-          className={`w-full max-w-5xl rounded-full transition-fluid ${
+          className={`w-full rounded-full transition-all duration-500 ${
             isScrolled
-              ? 'bg-cream/85 text-ink py-2.5 px-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl border border-white/60'
-              : 'bg-transparent text-cream py-3 px-2'
+              ? 'text-ink py-3 px-6'
+              : 'bg-transparent text-cream py-3 px-2 shadow-none'
           }`}
         >
           <div className="flex justify-between items-center w-full">
@@ -92,16 +124,16 @@ export const StickyNav: React.FC<StickyNavProps> = ({ onBookVisitClick }) => {
 
             {/* Book a visit CTA */}
             <div className="hidden md:block">
-              <button
+              <MagneticButton
                 onClick={onBookVisitClick}
-                className={`px-6 py-2.5 rounded-full font-display font-medium text-xs tracking-wider uppercase shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+                className={`px-6 py-2.5 rounded-full font-display font-medium text-xs tracking-wider uppercase shadow-sm hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                   isScrolled
-                    ? 'bg-gradient-to-r from-marigold to-marigold-deep text-twilight-deep focus:ring-marigold'
-                    : 'bg-white/10 backdrop-blur-md border border-white/20 text-cream hover:bg-white/20 focus:ring-cream'
+                    ? 'bg-gradient-to-r from-marigold to-marigold-deep text-twilight-deep focus:ring-marigold hover:shadow-[0_10px_20px_-5px_rgba(255,184,77,0.4)]'
+                    : 'bg-white/10 backdrop-blur-md border border-white/20 text-cream hover:bg-white/20 focus:ring-cream hover:shadow-[0_10px_20px_-5px_rgba(255,255,255,0.2)]'
                 }`}
               >
                 Book a Visit
-              </button>
+              </MagneticButton>
             </div>
 
             {/* Mobile Menu Button */}
@@ -123,6 +155,7 @@ export const StickyNav: React.FC<StickyNavProps> = ({ onBookVisitClick }) => {
               </button>
             </div>
           </div>
+        </div>
         </div>
       </nav>
 

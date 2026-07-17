@@ -1,11 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { FAQ_DATA, PROGRAMS_DATA } from '../data';
-import { ChevronDown, HelpCircle, Star } from 'lucide-react';
-import { HandDrawnStar } from './SVGIcons';
+import { HelpCircle } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
+import { FAQItem, Program } from '../types';
 
 export const FeesAdmissions: React.FC = () => {
   const [openFaqId, setOpenFaqId] = useState<string | null>(null);
+  const [faqs, setFaqs] = useState<FAQItem[]>(FAQ_DATA);
+  const [programs, setPrograms] = useState<Program[]>(PROGRAMS_DATA);
+
+  useEffect(() => {
+    const fetchFaqsAndPrograms = async () => {
+      try {
+        const [faqsRes, progRes] = await Promise.all([
+          supabase.from('faqs').select('*').order('display_order', { ascending: true }),
+          supabase.from('programs').select('*')
+        ]);
+
+        if (faqsRes.error) throw faqsRes.error;
+        if (progRes.error) throw progRes.error;
+
+        if (faqsRes.data && faqsRes.data.length > 0) {
+          setFaqs(faqsRes.data);
+        }
+        if (progRes.data && progRes.data.length > 0) {
+          const mapped: Program[] = progRes.data.map(item => ({
+            id: item.id,
+            name: item.name,
+            stars: item.stars,
+            ageRange: item.age_range,
+            highlights: item.highlights,
+            timing: item.timing,
+            annualFee: item.annual_fee
+          }));
+          setPrograms(mapped);
+        }
+      } catch (err) {
+        console.error('Failed to fetch FAQs/programs from Supabase, using local fallback:', err);
+      }
+    };
+
+    fetchFaqsAndPrograms();
+  }, []);
 
   const toggleFaq = (id: string) => {
     if (openFaqId === id) {
@@ -39,116 +76,101 @@ export const FeesAdmissions: React.FC = () => {
   ];
 
   return (
-    <section id="admissions" className="py-20 md:py-28 bg-cream-soft scroll-mt-12">
+    <section id="admissions" className="py-24 md:py-32 bg-[#FDFDFD] scroll-mt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-          <motion.span
-            initial={{ opacity: 0, y: 15 }}
+        {/* Editorial Section Header */}
+        <div className="max-w-3xl mb-24 space-y-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5 }}
-            className="text-coral font-display font-semibold uppercase tracking-wider text-xs sm:text-sm bg-coral/10 px-3 py-1 rounded-full"
+            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className="flex items-center space-x-4"
           >
-            Admissions & Fees
-          </motion.span>
+            <div className="h-[1px] w-12 bg-coral/40"></div>
+            <span className="text-coral font-mono text-xs uppercase tracking-[0.2em]">
+              Admissions & Investment
+            </span>
+          </motion.div>
+          
           <motion.h2
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-ink font-display font-bold tracking-tight"
-            style={{ fontSize: 'clamp(26px, 3.6vw, 38px)' }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+            className="text-ink text-editorial-hero font-bold tracking-tight leading-[1.05]"
           >
-            Clear paths, straightforward terms
+            Clear paths, <br/>
+            <span className="text-ink/40 italic font-serif font-normal block mt-2">straightforward terms.</span>
           </motion.h2>
+          
           <motion.p
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-ink-soft font-sans text-sm sm:text-base leading-relaxed"
+            transition={{ duration: 0.7, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="text-ink/70 text-editorial-body max-w-xl"
           >
-            We hold transparency as a core trust building block. Explore our standard structural program terms, sequential steps, and core questions below.
+            We hold transparency as a core trust building block. Explore our standard structural program terms and sequential steps below.
           </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-20">
-          {/* Left Column: Fee Structure Table (8-cols) */}
-          <div className="lg:col-span-7 space-y-4">
-            <div className="bg-white rounded-3xl p-6 sm:p-8 border border-cream-soft shadow-[0_4px_24px_-6px_rgba(45,42,61,0.04)] overflow-hidden">
-              <h3 className="text-ink font-display font-bold text-xl mb-6 flex items-center space-x-2">
-                <span className="text-marigold"><Star size={20} fill="#FFB84D" /></span>
-                <span>Annual Fee Structure</span>
-              </h3>
-
-              {/* Table Container */}
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="border-b border-cream-soft text-[11px] font-mono tracking-wider text-ink-soft/60 uppercase">
-                      <th className="pb-3 pr-4">Program</th>
-                      <th className="pb-3 px-4">Ages</th>
-                      <th className="pb-3 px-4">Timing</th>
-                      <th className="pb-3 pl-4 text-right">Annual Term Fee</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-cream-soft font-sans text-sm">
-                    {PROGRAMS_DATA.map((prog) => (
-                      <tr key={prog.id} className="hover:bg-cream-soft/20 transition-colors duration-150">
-                        <td className="py-4 pr-4 font-display font-semibold text-ink">
-                          {prog.name}
-                        </td>
-                        <td className="py-4 px-4 text-ink-soft font-medium">
-                          {prog.ageRange}
-                        </td>
-                        <td className="py-4 px-4 text-ink-soft font-mono text-xs">
-                          {prog.timing}
-                        </td>
-                        <td className="py-4 pl-4 text-right font-bold text-twilight font-mono">
-                          ₹[{prog.annualFee.toLocaleString()}]
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
-              {/* Fee Notice footnote as specified */}
-              <div className="mt-6 pt-4 border-t border-cream-soft">
-                <p className="text-[12px] italic text-ink-soft/70 leading-relaxed">
-                  * Note: The fee amounts listed above in bracketed ₹[amount] format are placeholder figures representing standard ranges. These can be adjusted by the academy administration during formal admission checks.
-                </p>
-                <div className="mt-4 flex items-center space-x-2 bg-marigold/10 p-3.5 rounded-xl border border-marigold/20 text-[12.5px] text-ink-soft">
-                  <span className="text-marigold"><HandDrawnStar size={16} /></span>
-                  <span className="font-sans leading-snug">
-                    Fees cover Montessori materials, double-gated safety monitoring, and organic fruit snacks. Star Bus transportation is calculated separately.
-                  </span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 lg:gap-32 items-start mb-32">
+          
+          {/* Left Column: Typographic Fee Structure */}
+          <div className="space-y-12">
+            <h3 className="text-ink font-serif italic text-2xl lg:text-3xl mb-8">
+              Annual Term Value
+            </h3>
+            
+            <div className="space-y-0 border-t border-black/[0.04]">
+              {programs.map((prog) => (
+                <div key={prog.id} className="group py-8 border-b border-black/[0.04] flex flex-col sm:flex-row sm:items-center justify-between gap-6 transition-all duration-500 hover:bg-white hover:shadow-paper-hover rounded-3xl px-6 -mx-6">
+                  <div>
+                    <h4 className="text-ink font-display font-bold text-2xl tracking-tight mb-2 group-hover:text-coral transition-colors duration-300">
+                      {prog.name}
+                    </h4>
+                    <div className="flex items-center space-x-3 text-ink/50 font-mono text-[10px] uppercase tracking-[0.2em]">
+                      <span>{prog.ageRange} Years</span>
+                      <span className="w-1 h-1 bg-ink/20 rounded-full"></span>
+                      <span>{prog.timing}</span>
+                    </div>
+                  </div>
+                  <div className="font-display font-bold text-3xl lg:text-4xl tracking-tight text-ink">
+                    ₹{prog.annualFee.toLocaleString()}
+                  </div>
                 </div>
-              </div>
+              ))}
+            </div>
+
+            {/* Subtle Fee Notice */}
+            <div className="pt-8">
+              <p className="text-ink/40 font-serif italic text-sm leading-relaxed max-w-md">
+                Fees cover Montessori materials, safety monitoring, and organic fruit snacks. Star Bus transportation is calculated separately upon formal admission check.
+              </p>
             </div>
           </div>
 
-          {/* Right Column: Admission Steps (5-cols) */}
-          <div className="lg:col-span-5 space-y-6">
-            <h3 className="text-ink font-display font-bold text-xl mb-2 flex items-center space-x-2">
-              <span className="text-coral">✦</span>
-              <span>Our Enrolment Steps</span>
+          {/* Right Column: Winding Path Admissions Steps */}
+          <div className="relative">
+            <h3 className="text-ink font-serif italic text-2xl lg:text-3xl mb-12">
+              The Journey Inward
             </h3>
             
-            <div className="space-y-6">
-              {steps.map((step) => (
-                <div key={step.num} className="flex gap-4 group">
-                  {/* Step Number in Plain Fredoka Marigold */}
-                  <div className="shrink-0 font-display font-bold text-3xl sm:text-4xl text-marigold tracking-tight select-none">
+            <div className="relative space-y-16 pl-6 sm:pl-10 border-l border-ink/10">
+              {steps.map((step, index) => (
+                <div key={step.num} className="relative group">
+                  {/* Floating Number Node */}
+                  <div className="absolute -left-[45px] sm:-left-[60px] top-0 w-12 h-12 bg-white border border-ink/10 rounded-full flex items-center justify-center font-serif text-lg text-ink shadow-[0_8px_16px_-6px_rgba(0,0,0,0.05)] group-hover:border-coral group-hover:text-coral transition-all duration-300 z-10">
                     {step.num}
                   </div>
-                  <div className="space-y-1 pt-1.5">
-                    <h4 className="text-ink font-display font-semibold text-base tracking-tight group-hover:text-twilight transition-colors duration-200">
+                  
+                  <div className="pt-2 pb-6">
+                    <h4 className="text-ink font-display font-bold text-xl lg:text-2xl tracking-tight mb-3 group-hover:text-coral transition-colors duration-300">
                       {step.title}
                     </h4>
-                    <p className="text-ink-soft font-sans text-xs sm:text-sm leading-relaxed">
+                    <p className="text-ink/60 font-sans text-base leading-relaxed">
                       {step.desc}
                     </p>
                   </div>
@@ -158,39 +180,41 @@ export const FeesAdmissions: React.FC = () => {
           </div>
         </div>
 
-        {/* FAQ Accordion Section */}
-        <div className="max-w-4xl mx-auto pt-8">
-          <div className="text-center mb-10 space-y-2">
-            <h3 className="text-ink font-display font-bold text-2xl tracking-tight">
-              Frequently Asked Questions
+        {/* FAQ Accordion Section (Editorial Style) */}
+        <div className="max-w-3xl mx-auto pt-16 border-t border-black/[0.04]">
+          <div className="mb-16 text-center space-y-4">
+            <h3 className="text-ink font-display font-bold text-4xl lg:text-5xl tracking-tight">
+              Curious Minds Ask
             </h3>
-            <p className="text-ink-soft font-sans text-xs sm:text-sm">
-              Clear, practical answers about our curriculum, safety gates, and transport lines.
+            <p className="text-ink/60 font-serif italic text-lg">
+              Clear, practical answers about our curriculum and safety.
             </p>
           </div>
 
           <div className="space-y-4">
-            {FAQ_DATA.map((faq) => {
+            {faqs.map((faq) => {
               const isOpen = openFaqId === faq.id;
               return (
                 <div
                   key={faq.id}
-                  className="bg-white border border-cream-soft rounded-2xl shadow-sm overflow-hidden transition-all duration-300"
+                  className="group border-b border-black/[0.04]"
                 >
                   <button
                     onClick={() => toggleFaq(faq.id)}
-                    className="w-full text-left py-4.5 px-6 flex items-center justify-between gap-4 font-display font-medium text-sm sm:text-base text-ink hover:text-twilight focus:outline-none focus:bg-cream-soft/10 transition-colors duration-200"
+                    className="w-full text-left py-6 flex items-start justify-between gap-6 font-display font-semibold text-lg lg:text-xl text-ink hover:text-twilight focus:outline-none transition-colors duration-200"
                     aria-expanded={isOpen}
                     aria-controls={`faq-answer-${faq.id}`}
                   >
-                    <div className="flex items-center space-x-3">
-                      <HelpCircle size={18} className="text-coral shrink-0" />
-                      <span className="font-semibold tracking-tight">{faq.question}</span>
-                    </div>
+                    <span className="tracking-tight leading-snug">{faq.question}</span>
 
-                    {/* Rotating Plus/Minus Icon */}
-                    <div className={`w-6 h-6 rounded-full bg-cream-soft/60 flex items-center justify-center text-ink shrink-0 transition-transform duration-300 ${isOpen ? 'rotate-45 text-coral' : ''}`}>
-                      <span className="text-lg font-bold select-none leading-none">+</span>
+                    <div className="mt-1 shrink-0">
+                      <motion.div
+                        animate={{ rotate: isOpen ? 45 : 0 }}
+                        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                        className="text-coral"
+                      >
+                        <span className="text-2xl font-serif leading-none">+</span>
+                      </motion.div>
                     </div>
                   </button>
 
@@ -201,9 +225,10 @@ export const FeesAdmissions: React.FC = () => {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                        className="overflow-hidden"
                       >
-                        <div className="px-6 pb-5 border-t border-cream-soft/40 text-xs sm:text-sm text-ink-soft leading-relaxed font-sans pt-3">
+                        <div className="pb-8 text-base text-ink/60 leading-relaxed font-sans pr-12">
                           {faq.answer}
                         </div>
                       </motion.div>
@@ -219,3 +244,4 @@ export const FeesAdmissions: React.FC = () => {
     </section>
   );
 };
+

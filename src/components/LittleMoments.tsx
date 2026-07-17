@@ -38,8 +38,7 @@ export const LittleMoments: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-ink font-display font-bold tracking-tight"
-            style={{ fontSize: 'clamp(26px, 3.6vw, 38px)' }}
+            className="text-ink text-editorial-hero font-bold tracking-tight"
           >
             Little moments of infinite wonder
           </motion.h2>
@@ -48,44 +47,56 @@ export const LittleMoments: React.FC = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-100px' }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-ink-soft font-sans text-sm sm:text-base leading-relaxed"
+            className="text-ink-soft text-editorial-body"
           >
             Instead of sterile stock photography of staged children, we share these hand-illustrated storybook windows into our classroom rituals.
           </motion.p>
         </div>
 
-        {/* Illustrations Bento Column */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {MOMENTS_DATA.map((moment, index) => (
-            <motion.div
-              key={moment.id}
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.6, delay: index * 0.15 }}
-              className="bg-white rounded-3xl p-6 border border-cream-soft shadow-[0_8px_20px_-6px_rgba(45,42,61,0.05)] hover:shadow-[0_15px_30px_-6px_rgba(45,42,61,0.08)] hover:scale-[1.02] transition-all duration-300 flex flex-col items-center justify-between group"
-            >
-              {/* Illustration Block Container */}
-              <div className="w-full bg-cream rounded-2xl p-4 flex items-center justify-center select-none border border-marigold/5 overflow-hidden relative">
-                {renderIllustration(moment.illustrationType)}
-                
-                {/* Micro hover feedback star */}
-                <div className="absolute top-3 right-3 text-marigold opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <HandDrawnStar size={14} />
+        {/* Alternating Storybook Rows */}
+        <div className="space-y-16 md:space-y-24">
+          {MOMENTS_DATA.map((moment, index) => {
+            const isEven = index % 2 === 0;
+            return (
+              <motion.div
+                key={moment.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
+                className={`flex flex-col md:flex-row items-center gap-8 md:gap-16 ${
+                  isEven ? 'md:flex-row' : 'md:flex-row-reverse'
+                }`}
+              >
+                {/* Illustration Panel (Left/Right) */}
+                <div className={`w-full md:w-1/2 p-6 bg-white/90 backdrop-blur-sm border-[3px] border-cream shadow-paper relative z-10 flex items-center justify-center select-none overflow-hidden h-64 md:h-80 group hover:shadow-paper-hover hover:-translate-y-2 transition-all duration-500 ${isEven ? 'shape-blob-1' : 'shape-blob-2'}`}>
+                  <div className="absolute inset-0 bg-gradient-to-br from-coral/0 to-coral/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  <div className="w-full h-full flex items-center justify-center p-4 bg-cream rounded-2xl border border-marigold/5 overflow-hidden">
+                    {renderIllustration(moment.illustrationType)}
+                  </div>
                 </div>
-              </div>
 
-              {/* Caption */}
-              <div className="pt-6 text-center">
-                <p className="text-ink font-display font-medium text-sm sm:text-base leading-relaxed max-w-[260px] mx-auto">
-                  {moment.caption}
-                </p>
-                <span className="text-[10px] font-mono tracking-widest text-coral uppercase block mt-2 font-semibold">
-                  {moment.id === 'moment1' ? 'Literacy Core' : moment.id === 'moment2' ? 'Bio Garden' : 'Creative Studio'}
-                </span>
-              </div>
-            </motion.div>
-          ))}
+                {/* Text/Content Panel (Right/Left) */}
+                <div className="w-full md:w-1/2 space-y-4 text-center md:text-left">
+                  <span className="text-[10px] font-mono tracking-widest text-coral uppercase block font-semibold">
+                    {moment.id === 'moment1' ? 'Literacy Core' : moment.id === 'moment2' ? 'Bio Garden' : 'Creative Studio'}
+                  </span>
+                  <h3 className="text-ink font-display font-bold text-2xl md:text-3xl tracking-tight leading-tight">
+                    {moment.id === 'moment1' ? 'Story circles and sensory canopy loops' : moment.id === 'moment2' ? 'Exploring ecosystems in cherry tomato fields' : 'Expressive finger-painting and pressed art projects'}
+                  </h3>
+                  <p className="text-ink-soft font-sans text-sm md:text-base leading-relaxed max-w-lg mx-auto md:mx-0">
+                    {moment.caption}
+                  </p>
+                  
+                  {/* High end bullet highlight */}
+                  <div className="flex items-center justify-center md:justify-start space-x-2 text-xs text-marigold font-mono font-medium">
+                    <HandDrawnStar size={12} />
+                    <span>NURTURED DISCOVERY INDEX · ✦ 0{index + 1}</span>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Cozy hand-drawn style quote bubble at bottom of Moments */}
@@ -97,7 +108,7 @@ export const LittleMoments: React.FC = () => {
           className="mt-16 text-center max-w-xl mx-auto"
         >
           <div className="bg-white border-2 border-dashed border-marigold/40 rounded-2xl p-5 relative">
-            <span className="font-handwritten text-coral text-xl md:text-2xl font-bold block">
+            <span className="font-handwritten text-coral text-2xl md:text-3xl font-bold block transform -rotate-2">
               "We believe childhood is a sandbox, not a race. Our stars find their glow because we let them explore without worksheets."
             </span>
             <span className="text-[11px] font-mono uppercase tracking-widest text-ink-soft/60 block mt-2 font-semibold">
