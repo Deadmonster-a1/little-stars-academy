@@ -44,15 +44,7 @@ export const Testimonials: React.FC = () => {
     fetchTestimonials();
   }, []);
 
-  const getBlobColor = (idx: number) => {
-    const colors = [
-      'bg-marigold/10',
-      'bg-coral/10',
-      'bg-meadow/10',
-      'bg-twilight/10'
-    ];
-    return colors[idx % colors.length];
-  };
+
 
   return (
     <section id="testimonials" ref={containerRef} className="py-32 md:py-48 bg-white relative overflow-hidden">
@@ -116,14 +108,13 @@ export const Testimonials: React.FC = () => {
                   whileHover={{ scale: 1.02 }}
                   viewport={{ once: true, margin: '-50px' }}
                   transition={{ duration: 0.8, delay: index * 0.1, type: "spring", stiffness: 200, damping: 30 }}
-                  className="relative flex flex-col justify-between w-[85vw] md:w-[600px] lg:w-[800px] bg-white rounded-[3rem] border-[3px] shadow-paper p-10 md:p-16 lg:p-20 overflow-hidden group cursor-pointer"
+                  className="relative flex flex-col justify-between w-[85vw] md:w-[600px] lg:w-[800px] bg-white border border-black/10 p-10 md:p-16 lg:p-20 overflow-hidden group cursor-pointer transition-colors duration-500"
                 >
-                  {/* Giant Abstract Blob Background */}
-                  <div className={`absolute top-0 right-0 w-[400px] h-[400px] md:w-[600px] md:h-[600px] rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3 pointer-events-none transition-transform duration-1000 group-hover:scale-110 ${getBlobColor(index)}`} />
+                  <div className="absolute inset-0 bg-ink/[0.02] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
                   {/* Quote Icon */}
                   <div className="relative z-10 mb-12 lg:mb-16">
-                    <div className="w-16 h-16 rounded-full bg-ink flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform duration-500">
+                    <div className="w-16 h-16 bg-ink flex items-center justify-center transition-colors duration-500 group-hover:bg-coral">
                       <Quote size={24} className="text-white fill-current" />
                     </div>
                   </div>

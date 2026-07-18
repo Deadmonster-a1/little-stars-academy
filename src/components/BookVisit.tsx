@@ -92,41 +92,39 @@ export const BookVisit: React.FC = () => {
         </div>
       </div>
 
-      {/* Massive Typographic Link Area */}
+      {/* Professional Corporate/Academy Link Area */}
       <div className="flex-grow flex flex-col justify-center items-center py-24 md:py-32 relative z-10 px-4">
         
-        {/* Subtle decorative stars */}
-        <div className="absolute top-20 left-20 text-cream/5 pointer-events-none -rotate-12">
-          <HandDrawnStar size={200} />
-        </div>
-        <div className="absolute bottom-20 right-20 text-cream/5 pointer-events-none rotate-12">
-          <HandDrawnStar size={300} />
-        </div>
-
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: '-100px' }}
-          className="text-center w-full max-w-[1400px] mx-auto"
+          className="text-center w-full max-w-4xl mx-auto"
         >
-          <p className="text-marigold font-mono text-[10px] uppercase tracking-[0.3em] font-bold mb-8">
-            The Next Step
+          {/* Professional Eyebrow Label */}
+          <div className="flex items-center justify-center space-x-4 mb-8">
+            <div className="h-[1px] w-12 bg-marigold/40"></div>
+            <span className="text-marigold font-mono text-sm uppercase tracking-widest font-bold">
+              The Next Step
+            </span>
+            <div className="h-[1px] w-12 bg-marigold/40"></div>
+          </div>
+
+          <h2 className="font-display font-bold text-5xl md:text-6xl lg:text-7xl leading-[1.15] tracking-tight text-white mb-8">
+            Begin your child's <br className="hidden md:block" />
+            <span className="italic font-serif font-light text-cream/80">journey with us.</span>
+          </h2>
+          
+          <p className="text-cream/60 font-sans text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
+            Experience our nurturing environment firsthand. We invite you to schedule a visit, explore our classrooms, and meet the educators who make our academy special.
           </p>
 
           <button 
             onClick={() => setIsFormOpen(!isFormOpen)}
-            className="group block w-full text-center relative focus:outline-none"
+            className="group inline-flex items-center justify-center gap-4 bg-marigold hover:bg-white text-twilight-deep font-sans font-bold text-lg tracking-wide px-12 py-5 rounded-full transition-all duration-300 shadow-xl hover:shadow-2xl hover:-translate-y-1 focus:outline-none"
           >
-            <h2 className="font-display font-bold text-[12vw] sm:text-[10vw] leading-[0.9] tracking-tighter text-white hover:text-marigold transition-colors duration-500 flex items-center justify-center gap-4 md:gap-12">
-              REQUEST 
-              <span className="italic font-serif font-light text-cream/60 group-hover:text-white transition-colors duration-500">
-                A TOUR
-              </span>
-              <ArrowRight className="w-[8vw] h-[8vw] sm:w-[6vw] sm:h-[6vw] transform group-hover:translate-x-8 group-hover:-rotate-12 transition-transform duration-500 ease-out text-marigold" />
-            </h2>
-            <div className="w-full h-1 bg-cream/10 mt-12 overflow-hidden">
-               <div className="h-full bg-marigold w-0 group-hover:w-full transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"></div>
-            </div>
+            Request A Tour
+            <ArrowRight className="w-5 h-5 transform group-hover:translate-x-1 transition-transform duration-300" />
           </button>
         </motion.div>
       </div>

@@ -1,124 +1,130 @@
-import React from 'react';
-import { motion } from 'motion/react';
-import { MOMENTS_DATA } from '../data';
+import React, { useState } from 'react';
 import { StoryCircleIllustration, OutdoorIllustration, ArtIllustration, HandDrawnStar } from './SVGIcons';
 
+const MOMENTS = [
+  {
+    id: '01',
+    category: 'Literacy Core',
+    title: 'Story circles and sensory canopy loops',
+    desc: 'Under the reading oak, where stories come alive',
+    color: 'bg-[#FDF9F1]', // Marigold tinted cream
+    textColor: 'text-marigold',
+    illustration: <StoryCircleIllustration className="w-full h-full text-twilight opacity-80" />
+  },
+  {
+    id: '02',
+    category: 'Bio Garden',
+    title: 'Exploring ecosystems in cherry tomato fields',
+    desc: 'Tiny hands exploring wormholes and wild tomato gardens',
+    color: 'bg-[#F2FAF6]', // Meadow tinted cream
+    textColor: 'text-meadow',
+    illustration: <OutdoorIllustration className="w-full h-full text-twilight opacity-80" />
+  },
+  {
+    id: '03',
+    category: 'Creative Studio',
+    title: 'Expressive finger-painting and pressed art projects',
+    desc: 'Mini masterworks with fingerpaint and boundless wonder',
+    color: 'bg-[#FFF5F3]', // Coral tinted cream
+    textColor: 'text-coral',
+    illustration: <ArtIllustration className="w-full h-full text-twilight opacity-80" />
+  }
+];
+
 export const LittleMoments: React.FC = () => {
-  // Map our handcrafted inline illustration SVGs
-  const renderIllustration = (type: string) => {
-    switch (type) {
-      case 'story':
-        return <StoryCircleIllustration className="w-full h-44 text-twilight shrink-0" />;
-      case 'outdoor':
-        return <OutdoorIllustration className="w-full h-44 text-twilight shrink-0" />;
-      case 'art':
-        return <ArtIllustration className="w-full h-44 text-twilight shrink-0" />;
-      default:
-        return null;
-    }
-  };
+  const [hoveredIndex, setHoveredIndex] = useState<number>(0);
 
   return (
-    <section id="moments" className="py-20 md:py-28 bg-cream-soft scroll-mt-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="moments" className="py-24 md:py-48 bg-white relative">
+      <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-12">
         
-        {/* Section Header */}
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-          <motion.span
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5 }}
-            className="text-coral font-display font-semibold uppercase tracking-wider text-xs sm:text-sm bg-coral/10 px-3 py-1 rounded-full"
-          >
-            Illustrated Glimpses
-          </motion.span>
-          <motion.h2
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="text-ink text-editorial-hero font-bold tracking-tight"
-          >
-            Little moments of infinite wonder
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-100px' }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="text-ink-soft text-editorial-body"
-          >
+        {/* Cinematic Center Hero */}
+        <div className="text-center max-w-5xl mx-auto mb-20 md:mb-32 flex flex-col items-center">
+          <h2 className="text-ink text-editorial-hero font-bold tracking-tight leading-[1.05] text-balance mb-6">
+            Little moments of <span className="italic font-serif font-normal text-ink/40">infinite wonder</span>
+          </h2>
+          <p className="text-ink/60 font-sans text-xl leading-relaxed max-w-2xl">
             Instead of sterile stock photography of staged children, we share these hand-illustrated storybook windows into our classroom rituals.
-          </motion.p>
+          </p>
         </div>
 
-        {/* Alternating Storybook Rows */}
-        <div className="space-y-16 md:space-y-24">
-          {MOMENTS_DATA.map((moment, index) => {
-            const isEven = index % 2 === 0;
+        {/* Horizontal Accordion Gallery */}
+        <div 
+          className="flex flex-col lg:flex-row w-full h-[800px] lg:h-[700px] gap-4"
+          onMouseLeave={() => setHoveredIndex(0)}
+        >
+          {MOMENTS.map((moment, idx) => {
+            const isHovered = hoveredIndex === idx;
             return (
-              <motion.div
+              <div
                 key={moment.id}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
-                className={`flex flex-col md:flex-row items-center gap-8 md:gap-16 ${
-                  isEven ? 'md:flex-row' : 'md:flex-row-reverse'
-                }`}
+                onMouseEnter={() => setHoveredIndex(idx)}
+                className={`relative overflow-hidden rounded-[2.5rem] transition-all duration-[800ms] ease-[cubic-bezier(0.25,1,0.1,1)] cursor-pointer flex flex-col justify-end p-6 md:p-10 border border-black/5 ${moment.color} ${isHovered ? 'lg:flex-[3] flex-[3]' : 'lg:flex-1 flex-[1]'}`}
               >
-                {/* Illustration Panel (Left/Right) */}
-                <div className={`w-full md:w-1/2 p-6 bg-white/90 backdrop-blur-sm border-[3px] border-cream shadow-paper relative z-10 flex items-center justify-center select-none overflow-hidden h-64 md:h-80 group hover:shadow-paper-hover hover:-translate-y-2 transition-all duration-500 ${isEven ? 'shape-blob-1' : 'shape-blob-2'}`}>
-                  <div className="absolute inset-0 bg-gradient-to-br from-coral/0 to-coral/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-                  <div className="w-full h-full flex items-center justify-center p-4 bg-cream rounded-2xl border border-marigold/5 overflow-hidden">
-                    {renderIllustration(moment.illustrationType)}
+                
+                {/* Illustration Container (Fades in slightly and scales when active) */}
+                <div className={`absolute inset-0 pointer-events-none p-12 lg:p-24 flex items-center justify-center transition-all duration-1000 ease-out ${isHovered ? 'scale-100 opacity-100' : 'scale-95 opacity-50'}`}>
+                  <div className="w-full h-full max-w-[500px] max-h-[500px]">
+                    {moment.illustration}
                   </div>
                 </div>
 
-                {/* Text/Content Panel (Right/Left) */}
-                <div className="w-full md:w-1/2 space-y-4 text-center md:text-left">
-                  <span className="text-[10px] font-mono tracking-widest text-coral uppercase block font-semibold">
-                    {moment.id === 'moment1' ? 'Literacy Core' : moment.id === 'moment2' ? 'Bio Garden' : 'Creative Studio'}
-                  </span>
-                  <h3 className="text-ink font-display font-bold text-2xl md:text-3xl tracking-tight leading-tight">
-                    {moment.id === 'moment1' ? 'Story circles and sensory canopy loops' : moment.id === 'moment2' ? 'Exploring ecosystems in cherry tomato fields' : 'Expressive finger-painting and pressed art projects'}
-                  </h3>
-                  <p className="text-ink-soft font-sans text-sm md:text-base leading-relaxed max-w-lg mx-auto md:mx-0">
-                    {moment.caption}
-                  </p>
-                  
-                  {/* High end bullet highlight */}
-                  <div className="flex items-center justify-center md:justify-start space-x-2 text-xs text-marigold font-mono font-medium">
-                    <HandDrawnStar size={12} />
-                    <span>NURTURED DISCOVERY INDEX · ✦ 0{index + 1}</span>
+                {/* Content Overlay */}
+                <div className="relative z-10 w-full">
+                  <div className={`flex flex-col md:flex-row md:items-end justify-between gap-6 transition-opacity duration-500 delay-100 ${isHovered ? 'opacity-100' : 'opacity-0 lg:opacity-100 lg:scale-100'}`}>
+                    
+                    <div className="space-y-4">
+                      {/* Meta Tag */}
+                      <div className="flex items-center space-x-2 text-[10px] font-mono font-bold tracking-[0.2em] uppercase">
+                        <HandDrawnStar size={12} className={moment.textColor} />
+                        <span className="text-ink/50">NURTURED DISCOVERY INDEX · ✦ {moment.id}</span>
+                      </div>
+                      
+                      {/* Only visible when hovered on desktop, always visible on mobile if flexed */}
+                      <div className={`transition-all duration-700 ${isHovered ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0 hidden lg:block lg:opacity-0'}`}>
+                        <h3 className="text-ink font-display font-bold text-3xl md:text-4xl tracking-tight leading-tight mb-2 max-w-lg">
+                          {moment.title}
+                        </h3>
+                        <p className="text-ink/70 font-sans text-lg max-w-md">
+                          {moment.desc}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Category Pill */}
+                    <div className="shrink-0">
+                      <div className={`inline-flex px-5 py-2 rounded-full border border-black/10 bg-white/50 backdrop-blur-md font-mono text-xs font-bold uppercase tracking-widest ${moment.textColor}`}>
+                        {moment.category}
+                      </div>
+                    </div>
+
                   </div>
                 </div>
-              </motion.div>
+
+                {/* Desktop collapsed state title (Vertical text) */}
+                {!isHovered && (
+                  <div className="absolute inset-0 z-20 hidden lg:flex items-center justify-center pointer-events-none">
+                    <span className="font-display font-bold text-3xl text-ink tracking-tight whitespace-nowrap -rotate-90 opacity-40 transition-opacity duration-300">
+                      {moment.category}
+                    </span>
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>
 
-        {/* Cozy hand-drawn style quote bubble at bottom of Moments */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-          className="mt-16 text-center max-w-xl mx-auto"
-        >
-          <div className="bg-white border-2 border-dashed border-marigold/40 rounded-2xl p-5 relative">
-            <span className="font-handwritten text-coral text-2xl md:text-3xl font-bold block transform -rotate-2">
-              "We believe childhood is a sandbox, not a race. Our stars find their glow because we let them explore without worksheets."
-            </span>
-            <span className="text-[11px] font-mono uppercase tracking-widest text-ink-soft/60 block mt-2 font-semibold">
-              — Little Stars Philosophy
-            </span>
-            {/* Cute mini stars decorating */}
-            <div className="absolute -top-3 -left-3 text-marigold animate-pulse-glow"><HandDrawnStar size={16} /></div>
-            <div className="absolute -bottom-3 -right-3 text-marigold"><HandDrawnStar size={14} /></div>
+        {/* Editorial Philosophy Quote */}
+        <div className="mt-32 md:mt-48 text-center max-w-5xl mx-auto px-4">
+          <h3 className="font-display font-bold text-4xl md:text-5xl lg:text-7xl leading-[1.1] text-ink text-balance tracking-tight">
+            "We believe childhood is a <span className="text-coral italic font-serif font-normal">sandbox</span>, not a race. Our stars find their glow because we let them explore without worksheets."
+          </h3>
+          <div className="mt-12 flex items-center justify-center gap-4 text-ink/50 font-mono text-sm tracking-[0.2em] uppercase font-semibold">
+            <HandDrawnStar size={16} className="text-marigold" />
+            <span>Little Stars Philosophy</span>
+            <HandDrawnStar size={16} className="text-marigold" />
           </div>
-        </motion.div>
+        </div>
 
       </div>
     </section>

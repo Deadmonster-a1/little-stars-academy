@@ -80,26 +80,26 @@ export const StickyNav: React.FC<StickyNavProps> = ({ onBookVisitClick }) => {
         }`}
       >
         <div className={`w-full max-w-5xl transition-all duration-500 rounded-full ${
-          isScrolled ? 'shadow-paper border border-white/60 bg-cream/95 backdrop-blur-2xl' : ''
+          isScrolled ? 'shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-black/10 bg-white/90 backdrop-blur-2xl' : ''
         }`}>
-        <div 
-          className={`w-full rounded-full transition-all duration-500 ${
-            isScrolled
-              ? 'text-ink py-3 px-6'
-              : 'bg-transparent text-cream py-3 px-2 shadow-none'
-          }`}
-        >
+          <div 
+            className={`w-full rounded-full transition-all duration-500 ${
+              isScrolled
+                ? 'text-ink py-3 px-6'
+                : 'bg-transparent text-ink py-3 px-2 shadow-none'
+            }`}
+          >
           <div className="flex justify-between items-center w-full">
             {/* Logo */}
             <a
               href="#"
-              className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-marigold rounded-md"
+              className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-twilight-deep rounded-md"
               onClick={(e) => {
                 e.preventDefault();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
             >
-              <span className="text-marigold text-2xl font-semibold select-none animate-pulse-glow">✦</span>
+              <span className={`${isScrolled ? 'text-coral' : 'text-marigold'} text-2xl font-semibold select-none animate-pulse-glow`}>✦</span>
               <span className="font-display font-semibold text-lg tracking-tight">
                 Little Stars Academy
               </span>
@@ -113,11 +113,11 @@ export const StickyNav: React.FC<StickyNavProps> = ({ onBookVisitClick }) => {
                   href={link.href}
                   onClick={(e) => handleLinkClick(e, link.href)}
                   className={`relative group font-sans text-sm font-medium tracking-wide transition-colors duration-200 ${
-                    isScrolled ? 'text-ink-soft hover:text-ink' : 'text-cream/90 hover:text-white'
+                    isScrolled ? 'text-ink/70 hover:text-ink' : 'text-ink/80 hover:text-ink'
                   } focus:outline-none`}
                 >
                   {link.name}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-marigold transition-all duration-300 group-hover:w-full rounded-full"></span>
+                  <span className={`absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full rounded-full ${isScrolled ? 'bg-coral' : 'bg-marigold'}`}></span>
                 </a>
               ))}
             </div>
@@ -128,8 +128,8 @@ export const StickyNav: React.FC<StickyNavProps> = ({ onBookVisitClick }) => {
                 onClick={onBookVisitClick}
                 className={`px-6 py-2.5 rounded-full font-display font-medium text-xs tracking-wider uppercase shadow-sm hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                   isScrolled
-                    ? 'bg-gradient-to-r from-marigold to-marigold-deep text-twilight-deep focus:ring-marigold hover:shadow-[0_10px_20px_-5px_rgba(255,184,77,0.4)]'
-                    : 'bg-white/10 backdrop-blur-md border border-white/20 text-cream hover:bg-white/20 focus:ring-cream hover:shadow-[0_10px_20px_-5px_rgba(255,255,255,0.2)]'
+                    ? 'bg-ink text-white focus:ring-ink hover:shadow-[0_10px_20px_-5px_rgba(0,0,0,0.3)]'
+                    : 'bg-ink text-white hover:bg-ink-light focus:ring-ink shadow-sm'
                 }`}
               >
                 Book a Visit
@@ -143,14 +143,14 @@ export const StickyNav: React.FC<StickyNavProps> = ({ onBookVisitClick }) => {
                 className={`p-2 rounded-full transition-fluid focus:outline-none focus:ring-2 focus:ring-offset-2 relative w-10 h-10 ${
                   isScrolled
                     ? 'text-ink hover:bg-cream-soft focus:ring-ink/20'
-                    : 'text-cream hover:bg-white/10 focus:ring-cream/30'
+                    : 'text-ink hover:bg-ink/5 focus:ring-ink/30'
                 }`}
                 aria-expanded={isMobileMenuOpen}
               >
                 <span className="sr-only">Open main menu</span>
                 <div className="absolute inset-0 flex flex-col items-center justify-center space-y-1.5">
-                  <span className={`block w-5 h-0.5 rounded-full transition-fluid origin-center ${isScrolled || isMobileMenuOpen ? 'bg-current' : 'bg-white'} ${isMobileMenuOpen ? 'rotate-45 translate-y-[4px]' : ''}`}></span>
-                  <span className={`block w-5 h-0.5 rounded-full transition-fluid origin-center ${isScrolled || isMobileMenuOpen ? 'bg-current' : 'bg-white'} ${isMobileMenuOpen ? '-rotate-45 -translate-y-[4px]' : ''}`}></span>
+                  <span className={`block w-5 h-0.5 rounded-full transition-fluid origin-center ${isScrolled || isMobileMenuOpen ? 'bg-current' : 'bg-ink'} ${isMobileMenuOpen ? 'rotate-45 translate-y-[4px]' : ''}`}></span>
+                  <span className={`block w-5 h-0.5 rounded-full transition-fluid origin-center ${isScrolled || isMobileMenuOpen ? 'bg-current' : 'bg-ink'} ${isMobileMenuOpen ? '-rotate-45 -translate-y-[4px]' : ''}`}></span>
                 </div>
               </button>
             </div>
