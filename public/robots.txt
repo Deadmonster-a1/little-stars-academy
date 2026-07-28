@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Prevent crawling of specific routes
+Disallow: /admin
+Disallow: /login
+
+Sitemap: https://yourwebsite.com/sitemap.xml
