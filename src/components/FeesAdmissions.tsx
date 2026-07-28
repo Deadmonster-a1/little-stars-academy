@@ -45,6 +45,10 @@ export const FeesAdmissions: React.FC = () => {
   }, []);
 
   const toggleFaq = (id: string) => {
+    // Don't toggle if the user is actively selecting text
+    if (window.getSelection()?.toString().trim().length) {
+      return;
+    }
     if (openFaqId === id) {
       setOpenFaqId(null);
     } else {
@@ -76,7 +80,7 @@ export const FeesAdmissions: React.FC = () => {
   ];
 
   return (
-    <section id="admissions" className="py-24 md:py-32 bg-[#FDFDFD] scroll-mt-12">
+    <section id="admissions" className="py-24 md:py-32 bg-[#FDFDFD] scroll-mt-12 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Editorial Section Header */}
@@ -199,9 +203,17 @@ export const FeesAdmissions: React.FC = () => {
                   key={faq.id}
                   className="group border-b border-black/[0.04]"
                 >
-                  <button
+                  <div
+                    role="button"
+                    tabIndex={0}
                     onClick={() => toggleFaq(faq.id)}
-                    className="w-full text-left py-6 flex items-start justify-between gap-6 font-display font-semibold text-lg lg:text-xl text-ink hover:text-twilight focus:outline-none transition-colors duration-200"
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleFaq(faq.id);
+                      }
+                    }}
+                    className="w-full text-left py-6 flex items-start justify-between gap-6 font-display font-semibold text-lg lg:text-xl text-ink hover:text-twilight focus:outline-none transition-colors duration-200 cursor-pointer select-text"
                     aria-expanded={isOpen}
                     aria-controls={`faq-answer-${faq.id}`}
                   >
@@ -216,7 +228,7 @@ export const FeesAdmissions: React.FC = () => {
                         <span className="text-2xl font-serif leading-none">+</span>
                       </motion.div>
                     </div>
-                  </button>
+                  </div>
 
                   <AnimatePresence initial={false}>
                     {isOpen && (

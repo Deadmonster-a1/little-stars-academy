@@ -35,17 +35,17 @@ export const WhyUs: React.FC = () => {
         const content = card.querySelector('.bento-content');
         
         card.addEventListener('mouseenter', () => {
-          gsap.to(bg, { scale: 1.05, duration: 0.7, ease: 'power2.out' });
-          gsap.to(content, { y: -5, duration: 0.7, ease: 'power2.out' });
+          gsap.to(bg, { scale: 1.1, duration: 0.5, ease: 'back.out(1.5)' });
+          gsap.to(content, { y: -10, rotation: gsap.utils.random(-3, 3), duration: 0.5, ease: 'back.out(1.5)' });
         });
         
         card.addEventListener('mouseleave', () => {
-          gsap.to(bg, { scale: 1, duration: 0.7, ease: 'power2.out' });
-          gsap.to(content, { y: 0, duration: 0.7, ease: 'power2.out' });
+          gsap.to(bg, { scale: 1, duration: 0.5, ease: 'power2.out' });
+          gsap.to(content, { y: 0, rotation: 0, duration: 0.5, ease: 'power2.out' });
         });
       });
       
-      // Scroll animation
+      // Scroll animation (Entrance)
       gsap.fromTo(cards, 
         { y: 100, opacity: 0 },
         { 
@@ -60,6 +60,20 @@ export const WhyUs: React.FC = () => {
           }
         }
       );
+
+      // Scroll Parallax (Scrub)
+      cards.forEach((card, i) => {
+        gsap.to(card, {
+          y: -50 * (i % 2 === 0 ? 1 : 1.5), // Different speeds for odd/even cards
+          ease: 'none',
+          scrollTrigger: {
+            trigger: gridRef.current,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+          }
+        });
+      });
     }, container);
     return () => ctx.revert();
   }, []);
@@ -70,17 +84,17 @@ export const WhyUs: React.FC = () => {
         
         {/* Editorial Section Header - Massive AIDA Spacing */}
         <div className="max-w-4xl mb-24 md:mb-32">
-          <h2 className="text-ink text-editorial-hero font-bold tracking-tight leading-[1.05] text-balance">
+          <h2 className="text-ink text-4xl md:text-5xl lg:text-6xl font-display font-black tracking-tight leading-[1.05] text-balance">
             Why parents trust <br/>
-            <span className="text-ink/40 italic font-serif font-normal block mt-2">our starry world.</span>
+            <span className="text-coral inline-block -rotate-2 bg-marigold/20 px-6 py-2 rounded-3xl mt-4 border-4 border-coral border-dashed">our starry world.</span>
           </h2>
           <p className="text-ink/70 font-sans text-xl md:text-2xl leading-relaxed mt-10 max-w-2xl text-balance">
             We don’t believe in dry, conveyor-belt teaching. Every corner of our academy is optimized for emotional grounding, safety, and immersive discovery.
           </p>
         </div>
 
-        {/* Gapless Bento Grid */}
-        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[400px] grid-flow-dense gap-0 border-4 border-white shadow-2xl rounded-[3rem] overflow-hidden bg-white">
+        {/* Playful Bento Grid */}
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 auto-rows-[400px] grid-flow-dense gap-8">
           
           {WHY_US_DATA.map((card, index) => {
             // Calculate spans to make a dense grid
@@ -110,7 +124,7 @@ export const WhyUs: React.FC = () => {
             return (
               <div 
                 key={card.id} 
-                className={`bento-card relative overflow-hidden group border border-white/50 p-10 flex flex-col justify-between ${spanClasses}`}
+                className={`bento-card card-playful relative group p-10 flex flex-col justify-between ${bgClass.split(' ')[0]} ${spanClasses}`}
               >
                 {/* Background that scales on hover */}
                 <div className={`bento-bg absolute inset-0 ${bgClass} opacity-50 z-0`}></div>

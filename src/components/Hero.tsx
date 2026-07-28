@@ -1,6 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 import { motion } from 'motion/react';
-import { Hero3D } from './Hero3D';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface HeroProps {
   onBookVisitClick: () => void;
@@ -19,13 +22,8 @@ export const Hero: React.FC<HeroProps> = ({ onBookVisitClick }) => {
   return (
     <section
       ref={heroRef}
-      className="relative overflow-hidden min-h-[100dvh] flex flex-col justify-center items-center bg-cream pt-32 pb-32 md:pt-48 md:pb-48"
+      className="relative overflow-hidden min-h-[100dvh] flex flex-col justify-center items-center bg-transparent pt-32 pb-32 md:pt-48 md:pb-48"
     >
-      {/* Background 3D Toy Canvas */}
-      <div className="absolute inset-0 z-0 opacity-80 mix-blend-multiply pointer-events-none">
-        <Hero3D />
-      </div>
-
       <div className="absolute inset-0 bg-gradient-to-b from-transparent to-cream/80 z-10 pointer-events-none" />
 
       {/* Hero Core Content */}
@@ -35,11 +33,11 @@ export const Hero: React.FC<HeroProps> = ({ onBookVisitClick }) => {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-          className="text-ink text-editorial-hero font-bold leading-[0.95] tracking-tighter text-balance max-w-6xl w-full"
+          className="text-ink text-5xl md:text-6xl lg:text-7xl font-display font-black leading-[1.05] tracking-tight text-balance max-w-6xl w-full"
         >
           Every child is 
           <span 
-            className="inline-block w-24 h-12 md:w-32 md:h-16 lg:w-40 lg:h-20 rounded-full align-middle mx-3 lg:mx-5 bg-cover bg-center shadow-lg transition-transform duration-700 hover:scale-105 filter grayscale hover:grayscale-0" 
+            className="inline-block w-20 h-10 md:w-28 md:h-14 lg:w-36 lg:h-16 rounded-full align-middle mx-3 lg:mx-5 bg-cover bg-center border-4 border-ink shadow-[4px_4px_0_#2C3E50] transition-transform duration-500 hover:scale-110 hover:-rotate-3" 
             style={{backgroundImage: 'url(https://images.unsplash.com/photo-1545558014-8692077e9b5c?q=80&w=2070&auto=format&fit=crop)'}}
           ></span>
           a little star.
@@ -59,25 +57,25 @@ export const Hero: React.FC<HeroProps> = ({ onBookVisitClick }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-8 pt-4 w-full"
+          className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-4 w-full"
         >
           <button
             onClick={(e) => { e.stopPropagation(); onBookVisitClick(); }}
-            className="w-full sm:w-auto bg-ink text-white font-sans font-medium text-lg px-12 py-6 rounded-full shadow-[0_8px_30px_rgba(0,0,0,0.12)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.2)] hover:bg-ink-light hover:-translate-y-1 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-ink/20"
+            className="w-full sm:w-auto btn-playful bg-marigold text-twilight-deep text-xl px-12 py-5"
           >
             <span className="flex items-center justify-center gap-3">
-              Book a Free Visit
+              Book a Free Visit 🚀
             </span>
           </button>
           
           <button
             onClick={(e) => { e.stopPropagation(); scrollToSection('#programs'); }}
-            className="w-full sm:w-auto bg-transparent text-ink hover:text-twilight-deep font-sans font-medium text-lg transition-colors duration-300 focus:outline-none group flex items-center justify-center gap-3"
+            className="w-full sm:w-auto btn-playful bg-white text-ink text-xl px-12 py-5"
           >
-            <span>Explore Curriculum</span>
-            <div className="w-8 h-8 rounded-full border border-ink/20 flex items-center justify-center group-hover:border-twilight-deep transition-colors duration-300">
-               <ArrowDownIcon />
-            </div>
+            <span className="flex items-center justify-center gap-3">
+              Explore Curriculum
+              <ArrowDownIcon />
+            </span>
           </button>
         </motion.div>
       </div>

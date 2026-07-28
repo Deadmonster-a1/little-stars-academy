@@ -35,7 +35,7 @@ export const LittleMoments: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState<number>(0);
 
   return (
-    <section id="moments" className="py-24 md:py-48 bg-white relative">
+    <section id="moments" className="py-24 md:py-48 bg-white relative z-10">
       <div className="w-full max-w-[1800px] mx-auto px-4 sm:px-6 lg:px-12">
         
         {/* Cinematic Center Hero */}

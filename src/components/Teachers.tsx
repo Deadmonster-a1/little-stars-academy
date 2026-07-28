@@ -44,7 +44,7 @@ export const Teachers: React.FC = () => {
   }, []);
 
   return (
-    <section id="teachers" className="py-24 md:py-48 bg-white relative">
+    <section id="teachers" className="py-24 md:py-48 bg-white relative z-10">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12">
         <div className="flex flex-col lg:flex-row items-start gap-16 lg:gap-24 relative">
           
@@ -54,10 +54,10 @@ export const Teachers: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="text-ink text-editorial-hero font-bold tracking-tight leading-[1.05]"
+              className="text-ink text-4xl md:text-5xl lg:text-6xl font-display font-black tracking-tight leading-[1.05]"
             >
               Meet the hearts <br/>
-              <span className="text-ink/30 italic font-serif font-normal">behind our stars.</span>
+              <span className="text-twilight inline-block -rotate-2 bg-twilight/10 px-6 py-2 rounded-3xl mt-4 border-4 border-twilight border-dashed">behind our stars.</span>
             </motion.h2>
             <motion.p 
               initial={{ opacity: 0, y: 20 }}
@@ -83,10 +83,10 @@ export const Teachers: React.FC = () => {
                   transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                   className="group flex flex-col md:flex-row gap-8 lg:gap-12 items-center md:items-start"
                 >
-                  {/* High-end Image Reveal */}
-                  <div className="w-full md:w-1/2 shrink-0 overflow-hidden rounded-[2rem] aspect-[4/5] bg-cream shadow-paper">
+                  {/* Playful Polaroid Image Reveal */}
+                  <div className="w-full md:w-1/2 shrink-0 overflow-hidden rounded-[2rem] aspect-[4/5] bg-cream card-playful">
                     <div 
-                      className="w-full h-full bg-cover bg-center transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.1,1)] group-hover:scale-110 filter grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100"
+                      className="w-full h-full bg-cover bg-center transition-transform duration-[1.5s] ease-[cubic-bezier(0.25,1,0.1,1)] group-hover:scale-110"
                       style={{ backgroundImage: `url(${bgImg})` }}
                     />
                   </div>
@@ -94,17 +94,21 @@ export const Teachers: React.FC = () => {
                   {/* Teacher Content */}
                   <div className="w-full md:w-1/2 flex flex-col justify-center space-y-6 pt-4 md:pt-12">
                     <div>
-                      <h3 className="text-3xl lg:text-4xl font-display font-bold text-ink tracking-tight mb-2 group-hover:text-coral transition-colors duration-500">
+                      <h3 className="text-4xl lg:text-5xl font-display font-black text-ink tracking-tight mb-2 transition-colors duration-500">
                         {teacher.name}
                       </h3>
-                      <p className="text-marigold font-mono text-xs uppercase tracking-[0.2em] font-bold">
+                      <p className="inline-block bg-marigold px-4 py-1.5 rounded-full border-2 border-ink shadow-[2px_2px_0_#2C3E50] font-display font-bold text-sm uppercase tracking-wider text-ink mt-2">
                         {teacher.role} • {teacher.experienceYears} Yrs
                       </p>
                     </div>
                     
-                    <p className="font-serif italic text-ink/70 text-xl lg:text-2xl leading-relaxed">
-                      "{teacher.quote}"
-                    </p>
+                    <div className="bg-white p-6 rounded-[2rem] border-4 border-ink shadow-[4px_4px_0_#2C3E50] relative">
+                      {/* Little decorative quote mark */}
+                      <span className="absolute -top-6 -left-2 text-6xl text-twilight font-display animate-bounce">"</span>
+                      <p className="font-sans font-bold text-ink/80 text-xl leading-relaxed relative z-10 pt-2">
+                        {teacher.quote}
+                      </p>
+                    </div>
                   </div>
                 </motion.div>
               );

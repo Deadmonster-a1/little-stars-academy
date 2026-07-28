@@ -2,7 +2,9 @@ import React, { useEffect } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Helmet } from 'react-helmet-async';
 import { StickyNav } from '../components/StickyNav';
+import { Global3DScene } from '../components/Global3DScene';
 import { Hero } from '../components/Hero';
 import { WhyUs } from '../components/WhyUs';
 import { Programs } from '../components/Programs';
@@ -50,10 +52,20 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-cream text-ink selection:bg-marigold/30 relative">
+      <Helmet>
+        <title>Little Stars Academy | A Cosmic Sandbox for Early Childhood</title>
+        <meta name="description" content="Experience our nurturing preschool environment firsthand. We believe early childhood is a cosmic sandbox. Explore our curriculum and book a free visit today." />
+        <meta property="og:title" content="Little Stars Academy" />
+        <meta property="og:description" content="A premium kindergarten and preschool focused on structured, play-first curriculum and warm guidance." />
+      </Helmet>
+      
       <AnnouncementPopup />
       
       {/* Sticky Navigation */}
       <StickyNav onBookVisitClick={scrollToInquiryForm} />
+      
+      {/* Global 3D Background Scene */}
+      <Global3DScene />
 
       <main className="flex-grow w-full max-w-full">
         <Hero onBookVisitClick={scrollToInquiryForm} />

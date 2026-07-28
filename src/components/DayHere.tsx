@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Sparkles, Sun, Compass, Coffee, Smile, BookOpen, LogOut, Clock } from 'lucide-react';
+
+gsap.registerPlugin(ScrollTrigger);
 import { HandDrawnStar } from './SVGIcons';
 
 const DAY_SCHEDULE = [
@@ -86,8 +90,49 @@ const DAY_SCHEDULE = [
 ];
 
 export const DayHere: React.FC = () => {
+  const container = useRef<HTMLElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const ctx = gsap.context(() => {
+      const cards = gsap.utils.toArray<HTMLElement>('.day-card');
+      
+      // Entrance Animation
+      gsap.fromTo(cards, 
+        { y: 100, opacity: 0 },
+        { 
+          y: 0, 
+          opacity: 1, 
+          duration: 1, 
+          stagger: 0.1, 
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: gridRef.current,
+            start: 'top 80%',
+          }
+        }
+      );
+
+      // Parallax effect on scroll
+      cards.forEach((card, i) => {
+        gsap.to(card, {
+          y: -40 * (i % 2 === 0 ? 1 : 1.5),
+          ease: 'none',
+          scrollTrigger: {
+            trigger: gridRef.current,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+          }
+        });
+      });
+    }, container);
+    
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section id="day-here" className="py-24 md:py-32 bg-white relative overflow-hidden">
+    <section id="day-here" ref={container} className="py-24 md:py-32 bg-white relative z-10 overflow-hidden">
       
       {/* Background Star watermarks */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden z-0">
@@ -101,46 +146,46 @@ export const DayHere: React.FC = () => {
 
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
         
-        {/* Massive Editorial Header for the Bento Grid */}
+        {/* Playful Header */}
         <div className="mb-20 max-w-5xl">
-          <h2 className="text-ink text-editorial-hero font-bold tracking-tight leading-[1.05] text-balance">
+          <h2 className="text-ink text-4xl md:text-5xl lg:text-6xl font-display font-black tracking-tight leading-[1.05] text-balance">
             A day in our <br/>
-            <span className="text-ink/40 italic font-serif font-normal block mt-2">starry cosmos</span>
+            <span className="text-meadow inline-block -rotate-2 bg-meadow/10 px-6 py-2 rounded-3xl mt-4 border-4 border-meadow border-dashed">starry cosmos</span>
           </h2>
         </div>
 
         {/* Gapless Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 auto-rows-[400px] gap-6 grid-flow-dense">
+        <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-4 auto-rows-[400px] gap-6 grid-flow-dense">
           {DAY_SCHEDULE.map((stop, idx) => (
             <div 
               key={idx}
-              className={`group relative overflow-hidden rounded-[2.5rem] p-8 md:p-10 flex flex-col justify-between border border-black/5 ${stop.span} ${stop.color}`}
+              className={`day-card group relative overflow-hidden card-playful p-8 md:p-10 flex flex-col justify-between ${stop.span} ${stop.color}`}
             >
-              {/* Background Image on Hover */}
+              {/* Background Image on Hover (Bright, full color) */}
               <div 
-                className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-out bg-cover bg-center mix-blend-luminosity scale-105 group-hover:scale-100"
+                className="absolute inset-0 z-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-[var(--ease-bouncy)] bg-cover bg-center scale-110 group-hover:scale-100"
                 style={{ backgroundImage: `url(${stop.bgImage})` }}
               />
-              {/* Dark Wash on Hover */}
-              <div className="absolute inset-0 z-0 bg-ink/70 opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-out" />
+              {/* Vibrant Wash on Hover */}
+              <div className={`absolute inset-0 z-0 opacity-0 group-hover:opacity-90 transition-opacity duration-500 ease-out ${stop.color}`} />
 
               {/* Content (Z-10 to stay above background) */}
-              <div className="relative z-10 flex justify-between items-start transition-transform duration-700 group-hover:-translate-y-2">
-                <div className={`w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center transition-colors duration-700 group-hover:bg-transparent group-hover:text-white border border-black/5 group-hover:border-white/20 ${stop.textColor}`}>
+              <div className="relative z-10 flex justify-between items-start transition-transform duration-500 ease-[var(--ease-bouncy)] group-hover:-translate-y-2 group-hover:scale-105">
+                <div className={`w-14 h-14 rounded-full bg-white border-4 border-ink shadow-[4px_4px_0_#2C3E50] flex items-center justify-center transition-colors duration-500 group-hover:bg-white group-hover:border-ink ${stop.textColor}`}>
                   {stop.icon}
                 </div>
-                <div className="bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full shadow-sm border border-black/5 group-hover:bg-white/10 group-hover:border-white/20 transition-colors duration-700">
-                  <span className="font-mono text-xs font-bold uppercase tracking-widest text-ink group-hover:text-white transition-colors duration-700">
+                <div className="bg-white px-5 py-2 rounded-full border-4 border-ink shadow-[4px_4px_0_#2C3E50] transition-colors duration-500">
+                  <span className="font-display text-sm font-bold uppercase tracking-wider text-ink">
                     {stop.time}
                   </span>
                 </div>
               </div>
 
-              <div className="relative z-10 transition-transform duration-700 group-hover:translate-y-2">
-                <h3 className="text-ink font-display font-bold text-3xl lg:text-4xl tracking-tight leading-tight mb-4 group-hover:text-white transition-colors duration-700">
+              <div className="relative z-10 transition-transform duration-500 ease-[var(--ease-bouncy)] group-hover:translate-y-2">
+                <h3 className="text-ink font-display font-black text-3xl lg:text-4xl tracking-tight leading-tight mb-4 transition-colors duration-500">
                   {stop.title}
                 </h3>
-                <p className="text-ink/70 font-sans text-lg leading-relaxed max-w-md group-hover:text-white/80 transition-colors duration-700">
+                <p className="text-ink font-sans font-medium text-lg leading-relaxed max-w-md transition-colors duration-500">
                   {stop.desc}
                 </p>
               </div>
